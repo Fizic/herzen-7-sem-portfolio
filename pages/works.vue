@@ -64,12 +64,19 @@ useHead({
 const files = ref([])
 const loading = ref(false)
 
-// Load files from server
+// Load files from server or static JSON
 const loadFiles = async () => {
   loading.value = true
   try {
-    const data = await $fetch('/api/works')
-    files.value = data || []
+    // Пытаемся загрузить с сервера API (для dev режима)
+    try {
+      const data = await $fetch('/api/works')
+      files.value = data || []
+    } catch (apiError) {
+      // Если API недоступен (статический сайт), загружаем из JSON
+      const data = await $fetch('/api/works.json')
+      files.value = data || []
+    }
   } catch (error) {
     console.error('Error loading files:', error)
     files.value = []

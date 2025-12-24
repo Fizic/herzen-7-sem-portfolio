@@ -150,11 +150,19 @@ const downloadFile = async (filePath, fileName) => {
       throw new Error('Путь к файлу пуст')
     }
     
-    const url = `/api/works/${pathSegments.join('/')}`
+    // Пытаемся использовать API endpoint, если недоступен - используем прямой путь к файлу
+    let url = `/api/works/${pathSegments.join('/')}`
     
     console.log('Downloading file:', { filePath, fileName, url })
     
-    const response = await fetch(url)
+    let response = await fetch(url)
+    
+    // Если API недоступен (404), пробуем прямой путь к файлу в works/
+    if (!response.ok && response.status === 404) {
+      url = `/works/${pathSegments.join('/')}`
+      response = await fetch(url)
+    }
+    
     if (!response.ok) {
       const errorText = await response.text().catch(() => response.statusText)
       throw new Error(`Ошибка ${response.status}: ${errorText}`)
