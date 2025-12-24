@@ -44,84 +44,34 @@ jobs:
       - name: Install dependencies
         run: ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
 
-      # Установка base URL для GitHub Pages
-      - name: Create nuxt.config.js with base URL
+      # Самый простой способ - добавить base URL через переменную окружения
+      - name: Build Nuxt for GitHub Pages
         run: |
-          if [ -f "nuxt.config.js" ]; then
-            # Создаем резервную копию
-            cp nuxt.config.js nuxt.config.js.backup
+          # Устанавливаем base URL через переменную окружения
+          echo "NITRO_BASE_URL=/herzen-7-sem-portfolio/" >> $GITHUB_ENV
+          echo "NUXT_BASE_URL=/herzen-7-sem-portfolio/" >> $GITHUB_ENV
 
-            # Если нужно, добавьте конфигурацию для GitHub Pages
-            # Это альтернативный вариант, если не хотите менять исходный файл
-            echo "Создание конфигурации для GitHub Pages..."
+          # Генерируем статический сайт
+          ${{ steps.detect-package-manager.outputs.manager }} run generate
 
-            # Создаем отдельный конфиг для продакшена
-            cat > nuxt.config.gh-pages.js << 'EOF'
-            import originalConfig from './nuxt.config.js'
-
-            export default {
-              ...originalConfig,
-              app: {
-                ...originalConfig.app,
-                baseURL: '/herzen-7-sem-portfolio/',
-                buildAssetsDir: '/_nuxt/',
-                cdnURL: 'https://fizic.github.io/herzen-7-sem-portfolio/'
-              },
-              ssr: false,
-              target: 'static',
-              router: {
-                base: '/herzen-7-sem-portfolio/'
-              }
-            }
-            EOF
-
-          else
-            # Если файл конфигурации не найден, создаем простой
-            echo "Создание базового nuxt.config.js..."
-            cat > nuxt.config.js << 'EOF'
-            export default {
-              app: {
-                baseURL: '/herzen-7-sem-portfolio/',
-                buildAssetsDir: '/_nuxt/'
-              },
-              ssr: false,
-              target: 'static',
-              router: {
-                base: '/herzen-7-sem-portfolio/'
-              },
-              generate: {
-                dir: 'dist'
-              }
-            }
-            EOF
-          fi
-
-      - name: Build with Nuxt
-        run: |
-          if [ -f "nuxt.config.gh-pages.js" ]; then
-            # Используем специальную конфигурацию для GitHub Pages
-            ${{ steps.detect-package-manager.outputs.manager }} run generate --config-file nuxt.config.gh-pages.js
-          else
-            ${{ steps.detect-package-manager.outputs.manager }} run generate
-          fi
-
-      # Для GitHub Pages нужно переместить файлы в корень dist
       - name: Prepare for GitHub Pages
         run: |
           if [ -d "dist" ]; then
             # Создаем .nojekyll файл для отключения Jekyll обработки
             touch dist/.nojekyll
 
-            # Если Nuxt создал папку с именем репозитория внутри dist
-            if [ -d "dist/herzen-7-sem-portfolio" ]; then
-              echo "Moving files from subdirectory to root..."
-              mv dist/herzen-7-sem-portfolio/* dist/
-              rm -rf dist/herzen-7-sem-portfolio
-            fi
-
             # Проверяем содержимое dist
-            echo "Contents of dist directory:"
+            echo "Содержимое директории dist:"
             ls -la dist/
+
+            # Проверяем index.html
+            if [ -f "dist/index.html" ]; then
+              echo "Проверяем index.html:"
+              head -20 dist/index.html
+            fi
+          else
+            echo "Директория dist не найдена!"
+            exit 1
           fi
 
       - name: Upload artifact
