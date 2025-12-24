@@ -3,13 +3,13 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: ['@nuxtjs/tailwindcss'],
   css: ['~/assets/css/main.css'],
-  
+
   // Настройки для GitHub Pages
   // base будет автоматически определен при деплое
   app: {
-    baseURL: process.env.NUXT_APP_BASE_URL || '/',
+    baseURL: process.env.NUXT_APP_BASE_URL || '/herzen-7-sem-portfolio/',
     buildAssetsDir: '_nuxt/',
-    cdnURL: process.env.NUXT_APP_BASE_URL || '/',
+    cdnURL: process.env.NUXT_APP_BASE_URL || '/herzen-7-sem-portfolio/',
     head: {
       title: 'Портфолио - Кирилл Фирсов',
       meta: [
@@ -22,21 +22,21 @@ export default defineNuxtConfig({
       ]
     }
   },
-  
+
   // Настройки роутера для правильной работы с baseURL
   router: {
     options: {
       strict: false
     }
   },
-  
+
   // Экспортируем baseURL в runtime config
   runtimeConfig: {
     public: {
-      baseURL: process.env.NUXT_APP_BASE_URL || '/'
+      baseURL: process.env.NUXT_APP_BASE_URL || '/herzen-7-sem-portfolio/'
     }
   },
-  
+
   // Для статической генерации
   nitro: {
     prerender: {
@@ -44,22 +44,22 @@ export default defineNuxtConfig({
       crawlLinks: true
     }
   },
-  
+
   // Копируем папку works в public при генерации и создаем JSON список
   hooks: {
     'nitro:build:before': async (nitro) => {
       const { copyFileSync, existsSync, mkdirSync, readdirSync, statSync, writeFileSync } = await import('fs')
       const { join } = await import('path')
-      
+
       const worksDir = join(process.cwd(), 'works')
       const publicWorksDir = join(process.cwd(), 'public', 'works')
       const publicApiDir = join(process.cwd(), 'public', 'api')
-      
+
       // Создаем директорию для API если её нет
       if (!existsSync(publicApiDir)) {
         mkdirSync(publicApiDir, { recursive: true })
       }
-      
+
       // Функция для чтения директории и создания структуры
       async function readDirectory(dirPath: string, relativePath: string = ''): Promise<any[]> {
         try {
@@ -105,21 +105,21 @@ export default defineNuxtConfig({
           return []
         }
       }
-      
+
       if (existsSync(worksDir)) {
         // Создаем директорию если её нет
         if (!existsSync(publicWorksDir)) {
           mkdirSync(publicWorksDir, { recursive: true })
         }
-        
+
         // Рекурсивно копируем файлы
         function copyRecursive(src: string, dest: string) {
           const entries = readdirSync(src, { withFileTypes: true })
-          
+
           for (const entry of entries) {
             const srcPath = join(src, entry.name)
             const destPath = join(dest, entry.name)
-            
+
             if (entry.isDirectory()) {
               if (!existsSync(destPath)) {
                 mkdirSync(destPath, { recursive: true })
@@ -130,10 +130,10 @@ export default defineNuxtConfig({
             }
           }
         }
-        
+
         copyRecursive(worksDir, publicWorksDir)
         console.log('Copied works directory to public')
-        
+
         // Генерируем JSON список файлов
         const files = await readDirectory(worksDir)
         const jsonPath = join(publicApiDir, 'works.json')
