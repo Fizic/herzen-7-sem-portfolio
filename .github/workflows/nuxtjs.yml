@@ -50,6 +50,7 @@ jobs:
           # Устанавливаем base URL через переменную окружения
           echo "NITRO_BASE_URL=/herzen-7-sem-portfolio/" >> $GITHUB_ENV
           echo "NUXT_BASE_URL=/herzen-7-sem-portfolio/" >> $GITHUB_ENV
+          echo "NUXT_APP_BASE_URL=/herzen-7-sem-portfolio/" >> $GITHUB_ENV
 
           # Генерируем статический сайт
           ${{ steps.detect-package-manager.outputs.manager }} run generate
