@@ -150,16 +150,20 @@ const downloadFile = async (filePath, fileName) => {
       throw new Error('Путь к файлу пуст')
     }
     
-    // Пытаемся использовать API endpoint, если недоступен - используем прямой путь к файлу
-    let url = `/api/works/${pathSegments.join('/')}`
+    // Получаем baseURL из конфигурации
+    const config = useRuntimeConfig()
+    const baseURL = config.public.baseURL || ''
     
-    console.log('Downloading file:', { filePath, fileName, url })
+    // Пытаемся использовать API endpoint, если недоступен - используем прямой путь к файлу
+    let url = `${baseURL}/api/works/${pathSegments.join('/')}`
+    
+    console.log('Downloading file:', { filePath, fileName, url, baseURL })
     
     let response = await fetch(url)
     
     // Если API недоступен (404), пробуем прямой путь к файлу в works/
     if (!response.ok && response.status === 404) {
-      url = `/works/${pathSegments.join('/')}`
+      url = `${baseURL}/works/${pathSegments.join('/')}`
       response = await fetch(url)
     }
     

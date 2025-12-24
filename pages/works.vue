@@ -68,6 +68,7 @@ const loading = ref(false)
 const loadFiles = async () => {
   loading.value = true
   try {
+    // $fetch автоматически учитывает baseURL из конфигурации Nuxt
     // Пытаемся загрузить с сервера API (для dev режима)
     try {
       const data = await $fetch('/api/works')

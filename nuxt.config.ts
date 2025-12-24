@@ -8,6 +8,7 @@ export default defineNuxtConfig({
   // base будет автоматически определен при деплое
   app: {
     baseURL: process.env.NUXT_APP_BASE_URL || '/',
+    buildAssetsDir: '_nuxt/',
     head: {
       title: 'Портфолио - Кирилл Фирсов',
       meta: [
@@ -18,6 +19,20 @@ export default defineNuxtConfig({
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
       ]
+    }
+  },
+  
+  // Настройки роутера для правильной работы с baseURL
+  router: {
+    options: {
+      strict: false
+    }
+  },
+  
+  // Экспортируем baseURL в runtime config
+  runtimeConfig: {
+    public: {
+      baseURL: process.env.NUXT_APP_BASE_URL || '/'
     }
   },
   

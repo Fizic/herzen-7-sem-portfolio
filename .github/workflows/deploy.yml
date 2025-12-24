@@ -29,7 +29,11 @@ jobs:
         run: npm ci
       
       - name: Generate static site
-        run: npm run generate
+        run: |
+          echo "Repository name: ${{ github.event.repository.name }}"
+          echo "Repository owner: ${{ github.repository_owner }}"
+          echo "Base URL: $NUXT_APP_BASE_URL"
+          npm run generate
         env:
           NODE_ENV: production
           NUXT_APP_BASE_URL: ${{ github.event.repository.name == format('{0}.github.io', github.repository_owner) && '/' || format('/{0}/', github.event.repository.name) }}
