@@ -40,7 +40,7 @@ export default defineNuxtConfig({
   // Для статической генерации
   nitro: {
     prerender: {
-      routes: ['/api/works'],
+      routes: ['/herzen-7-sem-portfolio/api/works'],
       crawlLinks: true
     }
   },
